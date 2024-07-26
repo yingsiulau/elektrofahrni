@@ -1,7 +1,8 @@
 <div class="header" style="background-color: #dd5857">
-  <img src="../assets/banner.png" />
+  <a href="https://elektrofahrni.ch/">
+    <img src="../assets/banner.png" />
+  </a>
 </div>
-
 <div class="wrapper">
   <h2 style="color: #656565">Vielen Dank für Ihre Bewerbung!</h2>
 
@@ -43,7 +44,6 @@
       <mat-error *ngIf="form.get('geburtsdatum')?.hasError('pastDate')">
         Geburtsdatum muss in der Vergangenheit liegen
       </mat-error>
-      
     </mat-form-field>
 
     <mat-form-field>
