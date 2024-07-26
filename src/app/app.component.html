@@ -1,6 +1,12 @@
+<div class="header" style="background-color: #dd5857">
+  <img src="../assets/banner.png" />
+</div>
+
 <div class="wrapper">
+  <h2 style="color: #656565">Vielen Dank für Ihre Bewerbung!</h2>
+
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <mat-form-field >
+    <mat-form-field>
       <mat-label>Vorname</mat-label>
       <input matInput formControlName="vorname" required />
     </mat-form-field>
@@ -16,14 +22,28 @@
         matInput
         formControlName="geburtsdatum"
         [matDatepicker]="picker"
+        placeholder="TT.MM.JJJJ"
+        (dateChange)="onDateChange($event)"
         required
       />
-      <mat-hint>TT.MM.JJJJ</mat-hint>
       <mat-datepicker-toggle
         matIconSuffix
         [for]="picker"
       ></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
+      <mat-error *ngIf="form.get('geburtsdatum')?.hasError('required')">
+        Geburtsdatum ist erforderlich
+      </mat-error>
+      <mat-error *ngIf="form.get('geburtsdatum')?.hasError('dateFormat')">
+        Geburtsdatum muss im Format TT.MM.JJJJ sein
+      </mat-error>
+      <mat-error *ngIf="form.get('geburtsdatum')?.hasError('invalidDate')">
+        Geburtsdatum ist ungültig
+      </mat-error>
+      <mat-error *ngIf="form.get('geburtsdatum')?.hasError('pastDate')">
+        Geburtsdatum muss in der Vergangenheit liegen
+      </mat-error>
+      
     </mat-form-field>
 
     <mat-form-field>
@@ -74,6 +94,7 @@
         matInput
         formControlName="nachricht"
         placeholder="Nachricht"
+        rows="5"
       ></textarea>
     </mat-form-field>
 

@@ -1,62 +1,63 @@
-import { Component } from '@angular/core';
+import { Component, LOCALE_ID } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
 
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { NativeDateAdapter } from "@angular/material/core";
 import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { format } from 'date-fns';
+import { de } from 'date-fns/locale';
+
 
 
 import { MatNativeDateModule, DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
-import { Platform } from '@angular/cdk/platform';
 import emailjs from 'emailjs-com';
+import { CustomDateAdapter } from './custom-date-adapter';
+import { CommonModule } from '@angular/common';
+
+// Import locale data
+import localeDeCh from '@angular/common/locales/de-CH';
+import { registerLocaleData } from '@angular/common';
+
+// Register the locale data
+registerLocaleData(localeDeCh);
 
 
-
-export class CustomDateAdapter extends NativeDateAdapter {
-  constructor(matDateLocale: string) {
-    super(matDateLocale);
-  }
-
-  override format(date: Date, _displayFormat: any): string {
-    const day = this._twoDigit(date.getDate());
-    const month = this._twoDigit(date.getMonth() + 1);
-    const year = date.getFullYear();
-    return `${day}.${month}.${year}`;
-  }
-
-  // Helper function to add leading zero if the number is less than 10
-  private _twoDigit(n: number): string {
-    return n < 10 ? '0' + n : n.toString();
-  }
-}
-
+export const MY_DATE_FORMATS = {
+  display: {
+    dateInput: 'DD.MM.YYYY',
+    monthYearLabel: 'MMM YYYY',
+    monthYearA11yLabel: 'MMMM YYYY',
+    yearA11yLabel: 'YYYY',
+  },
+  parse: {
+    dateInput: 'DD.MM.YYYY',
+  },
+};
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet,
     FormsModule,
+    CommonModule,
     ReactiveFormsModule,
-    HttpClientModule,
     MatInputModule,
     MatFormFieldModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatButtonModule
+    MatButtonModule,
+    MatSnackBarModule,
+    MatNativeDateModule // For date formatting
   ],
   providers: [
+    { provide: LOCALE_ID, useValue: 'de-CH' }, // Set the default locale
     { provide: MAT_DATE_LOCALE, useValue: 'de-CH' },
-
-    {
-      provide: DateAdapter,
-      useClass: CustomDateAdapter,
-      deps: [MAT_DATE_LOCALE, Platform]
-    },
+    { provide: DateAdapter, useClass: CustomDateAdapter },
+    { provide: MY_DATE_FORMATS, useValue: MY_DATE_FORMATS },
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -66,7 +67,7 @@ export class AppComponent {
   title = 'elektrofahrni';
   form: FormGroup;
 
-  constructor(private http: HttpClient, private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private _snackBar: MatSnackBar) {
     this.form = this.fb.group({
       vorname: ['', [Validators.required]],
       nachname: ['', [Validators.required]],
@@ -81,19 +82,10 @@ export class AppComponent {
     });
   }
 
-  onSubmit(): void {
+  public onSubmit(): void {
     if (this.form.valid) {
-      console.log(this.form.value.telefon);
-
       const date = new Date(this.form.value.geburtsdatum);
-      const options = {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      };
-
-      const formatter = new Intl.DateTimeFormat('de-DE');
-      const formattedDate = formatter.format(date);
+      const formattedDate = format(date, 'dd.MM.yyyy', { locale: de });
 
       console.log(formattedDate);
       const templateParams = {
@@ -111,12 +103,23 @@ export class AppComponent {
       emailjs.send('service_p2cmw3s', 'template_tblhiwf', templateParams, '1AbFLkhB2NiddtDp0')
         .then((response) => {
           console.log('Email sent successfully', response);
+          this.openSnackBar('Erfolgreich abgeschickt!', 'Schliessen')
         }, (error) => {
           console.error('Error sending email', error);
+          this.openSnackBar('Etwas ist schief gelaufen', 'Schliessen')
         });
     }
   }
 
+  onDateChange(event: any): void {
+    const date = event.value;
+    console.log(date);
+    
+    // Optional: hier kannst du weitere Anpassungen oder Validierungen vornehmen
+  }
 
 
+  private openSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action);
+  }
 }
