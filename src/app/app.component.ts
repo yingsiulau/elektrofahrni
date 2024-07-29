@@ -11,8 +11,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 
-
-
 import { MatNativeDateModule, DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
 import emailjs from 'emailjs-com';
 import { CustomDateAdapter } from './custom-date-adapter';
@@ -86,8 +84,6 @@ export class AppComponent {
     if (this.form.valid) {
       const date = new Date(this.form.value.geburtsdatum);
       const formattedDate = format(date, 'dd.MM.yyyy', { locale: de });
-
-      console.log(formattedDate);
       const templateParams = {
         vorname: this.form.value.vorname,
         nachname: this.form.value.nachname,
@@ -113,11 +109,7 @@ export class AppComponent {
 
   onDateChange(event: any): void {
     const date = event.value;
-    console.log(date);
-    
-    // Optional: hier kannst du weitere Anpassungen oder Validierungen vornehmen
   }
-
 
   private openSnackBar(message: string, action: string) {
     this._snackBar.open(message, action);

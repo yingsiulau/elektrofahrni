@@ -4,6 +4,16 @@
   }
 }
 
+h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700; /* Bold */
+}
+
+p form {
+  font-family: 'Montserrat', sans-serif o !important;
+  font-weight: 400 !important; /* Regular */
+}
+
 .wrapper {
   padding: 16px;
   max-width: 100%;
@@ -28,6 +38,7 @@
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
 
       &:disabled {
         background-color: #ccc;
@@ -35,6 +46,10 @@
       }
     }
   }
+}
+
+::ng-deep .mat-form-field .mat-input-element {
+  font-family: 'Montserrat', sans-serif;
 }
 
 // Responsive design for mobile devices
